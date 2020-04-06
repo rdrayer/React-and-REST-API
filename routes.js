@@ -13,13 +13,13 @@ const Course = require('./models').Course;
 
 // handler function to wrap each route
 function asyncHandler(cb) {
-    return async(req, res, next) => {
-      try {
-        await cb(req, res, next)
-      } catch(err) {
+  return async(req, res, next) => {
+    try {
+      await cb(req, res, next)
+    } catch(err) {
         next(err);
-      }
     }
+  }
 }
 
 // Authentication Middleware
@@ -69,12 +69,18 @@ const authenticateUser = async (req, res, next) => {
 // plan user routes
 // send GET request to /users 200 to return currently authenticated user
 router.get('/users', authenticateUser, asyncHandler(async(req, res) => {  
-  const user = req.currentUser;
-
-  res.json({
-    firstName: user.firstName,
-    emailAddress: user.emailAddress,
+  const authenticatedUser = req.currentUser;
+  const user = await User.findByPk(authenticatedUser.id, {
+    attributes: {
+      exclude: ['password', 'createdAt','updatedAt']
+    }
   });
+
+  if (user) {
+    res.status(200).json(user);
+  } else {
+    res.status(400).json({ message: 'User not found!' });
+  }
 }));
 
 // send POST request to /users 201 to create user (sets the location header to '/', and returns no content)
@@ -82,33 +88,72 @@ router.post('/users', asyncHandler(async(req, res) => {
   const user = req.body;
   user.password = bcryptjs.hashSync(user.password);
   await User.create(req.body);
-  return res.status(201).end();
+  return res.status(201).location('/').end();
 }));
 
 // plan course routes
 // send GET request to /courses 200 to return list of courses (includes the user that owns each course)
 router.get('/courses', asyncHandler(async(req, res) => {
-    const courses = await Course.findAll();
-    res.json(courses);
+    const courses = await Course.findAll({
+      attributes: {
+        exclude: ['createdAt', 'updatedAt']
+      },
+      include: [{ model: User, attributes: {
+        exclude: ['password', 'createdAt', 'updatedAt']
+      }}]
+    });
+    res.status(200).json(courses);
 }));
 
 // send GET request to /courses/:id 200 to return the course for the provided course id
 router.get('/courses/:id', asyncHandler(async(req, res) => {
-  res.status(200)
+  const course = await Course.findByPk(req.params.id, {
+    attributes: {
+      exclude: ['createdAt', 'updatedAt']
+    },
+    include: [{ model: User, attributes: {
+      exclude: ['password', 'createdAt', 'updatedAt']
+    }}]
+  });
+  res.status(200).json(course);
 }));
 
-// send POST request to /courses 201 to create a course (sets the location header to the uri for the course, returns no content)
-router.post('/courses', asyncHandler(async(req, res) => {
-  res.status(201)
+// send a POST request to /courses 201 to create a course (sets the location header to the uri for the course, returns no content)
+router.post('/courses', authenticateUser, asyncHandler(async(req, res) => {
+  const createCourse = await Course.create(req.body);
+  if (createCourse) {
+    res.status(201).location('/courses' + course.id).end();
+  } else {
+    res.status(400).json();
+  }
 }));
-// send PUT request to /courses/:id 204 to update a course and return no content
-router.put('/courses/:id', asyncHandler(async(req, res) => {
-  res.status(204)
+
+// send a PUT request to /courses/:id 204 to update a course and return no content
+router.put('/courses/:id', authenticateUser, asyncHandler(async(req, res) => {
+  const authenticatedUser = req.currentUser;
+  const course = await Course.findByPk(req.params.id);
+  if (authenticatedUser.id = course.userId) {
+    await course.save();
+    res.status(204).end();
+  } else {
+    res.status(403).json({ message: 'Changes to this course can only be made by the authorized user' });
+  }
 }));
 
 // send a DELETE request to /courses/:id 204 to delete a course and return no content
-router.delete('/courses/:id', asyncHandler(async(req, res) => {
-  res.status(204)
+router.delete('/courses/:id', authenticateUser, asyncHandler(async(req, res) => {
+  const authenticatedUser = req.currentUser;
+  const course = await Course.findByPk(req.params.id);
+  if (course) {
+    if (authenticatedUser.id === course.userId) {
+      await course.destroy();
+      res.status(204).end();
+    } else {
+      res.status(403).json({ message: 'Changes to this course can only be made by the authorized user' });
+    } 
+  } else {
+      res.status(400).json();
+  }
 }));
 
 module.exports = router;
