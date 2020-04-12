@@ -11,6 +11,9 @@ const router = express.Router();
 const User = require('./models').User;
 const Course = require('./models').Course;
 
+// connect express validator
+const { check, validationResult } = require('express-validator');
+
 // handler function to wrap each route
 function asyncHandler(cb) {
   return async(req, res, next) => {
@@ -85,10 +88,22 @@ router.get('/users', authenticateUser, asyncHandler(async(req, res) => {
 
 // send POST request to /users 201 to create user (sets the location header to '/', and returns no content)
 router.post('/users', asyncHandler(async(req, res) => {
-  const user = req.body;
-  user.password = bcryptjs.hashSync(user.password);
-  await User.create(req.body);
-  return res.status(201).location('/').end();
+  // get validation result from req object
+  const errors = validationResult(req);
+  // if there are validation errors
+  if (!errors.isEmpty()) {
+    //use array Map() method to get a list of error messages
+    const errorMessages = errors.array().map(error => error.msg);
+    //return the validation errors to the client
+    res.status(400).json({ errors: errorMessages });
+  } else {
+    const user = req.body;
+    if (user.password) {
+      user.password = bcryptjs.hashSync(user.password);
+    }
+    await User.create(req.body);
+    res.status(201).location('/').end();
+  }
 }));
 
 // plan course routes
@@ -120,8 +135,8 @@ router.get('/courses/:id', asyncHandler(async(req, res) => {
 
 // send a POST request to /courses 201 to create a course (sets the location header to the uri for the course, returns no content)
 router.post('/courses', authenticateUser, asyncHandler(async(req, res) => {
-  const createCourse = await Course.create(req.body);
-  if (createCourse) {
+  const course = await Course.create(req.body);
+  if (course) {
     res.status(201).location('/courses' + course.id).end();
   } else {
     res.status(400).json();
@@ -129,14 +144,31 @@ router.post('/courses', authenticateUser, asyncHandler(async(req, res) => {
 }));
 
 // send a PUT request to /courses/:id 204 to update a course and return no content
-router.put('/courses/:id', authenticateUser, asyncHandler(async(req, res) => {
-  const authenticatedUser = req.currentUser;
-  const course = await Course.findByPk(req.params.id);
-  if (authenticatedUser.id = course.userId) {
-    await course.save();
-    res.status(204).end();
+router.put('/courses/:id', authenticateUser,  [ 
+  check('title')
+      .exists()
+      .withMessage('Please provide a title'),
+  check('description')
+      .exists()
+      .withMessage('Please provide a description')
+], asyncHandler(async(req, res) => {
+  // get validation result from req object
+  const errors = validationResult(req);
+  // if there are validation errors
+  if (!errors.isEmpty()) {
+    //use array Map() method to get a list of error messages
+    const errorMessages = errors.array().map(error => error.msg);
+    //return the validation errors to the client
+    res.status(400).json({ errors: errorMessages });
   } else {
-    res.status(403).json({ message: 'Changes to this course can only be made by the authorized user' });
+    const authenticatedUser = req.currentUser;
+    const course = await Course.findByPk(req.params.id);
+    if (authenticatedUser.id = course.userId) {
+      await course.update(req.body);
+      res.status(204).end();
+    } else {
+      res.status(403).json({ message: 'Changes to this course can only be made by the authorized user' });
+    }
   }
 }));
 
