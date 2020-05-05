@@ -2,6 +2,8 @@
 
 // configure sequelize
 // load modules
+// Import cors library
+const cors = require('cors');
 const express = require('express');
 const morgan = require('morgan');
 const routes = require('./routes');
@@ -22,6 +24,9 @@ const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'tr
 
 // create the Express app
 const app = express();
+
+// Enable all CORS Requests
+app.use(cors());
 
 // setup req body JSON parsing.
 app.use(express.json());
