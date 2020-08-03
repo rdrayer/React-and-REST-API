@@ -14,17 +14,21 @@ import UpdateCourse from './components/UpdateCourse';
 import UserSignIn from './components/UserSignIn';
 import UserSignUp from './components/UserSignUp';
 import UserSignOut from './components/UserSignOut';
+import PrivateRoute from './PrivateRoute';
 
 import withContext from './Context';
+import Authenticated from './components/Authenticated';
 
 // Connect header component to context
 const HeaderWithContext = withContext(Header);
-// This connects the UserSignUp component to context. IOW, UserSignUp is now a consumping component that's subscribed to all context changes.
+// This connects the UserSignUp component to context
 const UserSignUpWithContext = withContext(UserSignUp);
 // Connect UserSignin to context:
 const UserSignInWithContext = withContext(UserSignIn); 
 // Connect UserSignOut to context:
 const UserSignOutWithContext = withContext(UserSignOut);
+// Connect Authenticated component to contect:
+const AuthWithContext = withContext(Authenticated);
 
 // Connect courses component to context
 const CoursesWithContext = withContext(Courses);
@@ -38,6 +42,7 @@ export default () => (
       <HeaderWithContext />
       <Switch>
         <Route exact path="/" component={CoursesWithContext} />
+        <PrivateRoute path="/authenticated" component={AuthWithContext} />
         <Route path="/courses/create" component={CreateCourseWithContext} />
         <Route path="/courses/:id/update" component={UpdateCourseWithContext} />
         <Route path="/courses/:id" component={CourseDetailWithContext} />

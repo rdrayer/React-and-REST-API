@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
 // Import the Data.js file containing the helper class:
 import Data from './Data';
-import Cookies from 'js-cookie';
+//import Cookies from 'js-cookie';
 
 const Context = React.createContext(); 
 
 export class Provider extends Component {
 
   state = {
-    authenticatedUser: Cookies.getJSON('authenticatedUser') || null
+    authenticatedUser: null
   };
 
   constructor() {
@@ -25,7 +25,8 @@ export class Provider extends Component {
     const value = {
       // Pass state to <Context.Provider> by adding authenticatedUser to the value object
       authenticatedUser,
-      data: this.data,
+      isAuthenticated,
+      data,
       actions: { 
         signIn: this.signIn,
         signOut: this.signOut,
@@ -51,7 +52,6 @@ export class Provider extends Component {
           authenticatedUser: user,
         };
       });
-      Cookies.set('authenticatedUser', JSON.stringify(user), { expires: 1 });
     }
     // Set signIn to reutrn the user object stored in the variable user:
     return user;
@@ -64,7 +64,6 @@ export class Provider extends Component {
         authenticatedUser: null,
       };
     });
-    Cookies.remove('authenticatedUser');
   }
 }
 
