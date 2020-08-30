@@ -25,8 +25,8 @@ export class Provider extends Component {
     const value = {
       // Pass state to <Context.Provider> by adding authenticatedUser to the value object
       authenticatedUser,
-      isAuthenticated,
-      data,
+      //isAuthenticated,
+      data : this.data,
       actions: { 
         signIn: this.signIn,
         signOut: this.signOut,

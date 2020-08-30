@@ -44,6 +44,7 @@ export default class Data {
     }
     else if (res.status === 400) {
       return res.json().then(data => {
+        console.log("api error for user creation");
         return data.errors;
       });
     }

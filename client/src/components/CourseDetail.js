@@ -4,11 +4,17 @@ import ReactMarkdown from 'react-markdown';
 
 export default class CourseDetail extends Component {
 
-    state = {
-        course: '',
-        author: [],
-        authenticatedUser: [],
-    };
+
+    constructor(props) {
+        super (props)
+        this.state = {
+            course: '',
+            author: [],
+            authenticatedUser: [],
+        };
+
+    }
+    
 
     componentDidMount() {
        const { context } = this.props;
@@ -27,15 +33,16 @@ export default class CourseDetail extends Component {
        })
     }
 
-    authButtons = () => {
+    authUpdate = () => {
         const courseId = this.props.match.params.id;
         const { authenticatedUser, author } = this.state;
         if (authenticatedUser) {
             if(author.id === authenticatedUser.id) {
+                console.log('authUse');
                 return(
-                    <span>
-                        <Link className="button" to={`/courses/${courseId}/update`}>Update Course</Link>
-                    </span>
+                    
+                    <Link className="button" to={`/courses/${courseId}/update`}>Update Course</Link>
+                    
                 )
             }
         }
@@ -70,9 +77,18 @@ export default class CourseDetail extends Component {
                 <div className="actions--bar">
                     <div className="bounds">
                         <div className="grid-100">
-                            {this.authButtons()}
-                            <Link className="button" to="/">Delete Course</Link>
-                            <Link className="button button-secondary" to="/">Return to List</Link>
+                        <span>
+                            
+                                
+                                    {this.authUpdate()}
+                                    <Link className="button button-secondary" to="/">Return to List</Link>
+                                
+                                
+                            
+                        </span>    
+                            
+                  
+                           
                         </div>
                     </div>
                 </div>
