@@ -80,10 +80,11 @@ export default class CourseDetail extends Component {
                         <span>
                             
                                 
-                                    {this.authUpdate()}
-                                    <Link className="button button-secondary" to="/">Return to List</Link>
-                                
-                                
+                        {this.authUpdate()}
+                        <Link className="button" to="/">Delete Course</Link>
+                        <Link className="button button-secondary" to="/">Return to List</Link>
+                    
+                    
                             
                         </span>    
                             
