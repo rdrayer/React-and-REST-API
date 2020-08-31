@@ -57,10 +57,11 @@ export default class Data {
 
   // Courses
   async getCourses() {
-    const res = await this.api('/courses', 'GET');
+    const res = await this.api('/courses', 'GET', null, false, null);
     if (res.status === 200) {
       return res.json().then((data) => data);
     } else {
+      console.log(res);
       throw new Error(
         'GET COURSES error'
       );
@@ -68,7 +69,7 @@ export default class Data {
   }
 
   async getCourse(id) {
-    const res = await this.api(`/courses/${id}`, 'GET');
+    const res = await this.api(`/courses/${id}`, 'GET', null, false, null);
     if (res.status === 200) {
       return res.json().then((data) => data);
     } else {
@@ -81,7 +82,7 @@ export default class Data {
   async createCourse(course, emailAddress, password) {
     const res = await this.api('/courses', 'POST', course, true, { emailAddress, password });
     if (res.status === 201) {
-      return null;
+      return [];
     } else if (res.status === 400) {
       //return data.errors;
     } else {
@@ -91,8 +92,8 @@ export default class Data {
     }
   }
 
-  async updateCourse(course, emailAddress, password) {
-    const res = await this.api(`/courses/${course.id}`, 'PUT', course, true, { emailAddress, password });
+  async updateCourse(courseId, course, emailAddress, password) {
+    const res = await this.api(`/courses/${courseId}`, 'PUT', course, true, { emailAddress, password });
     if (res.status === 204) {
       return [];
     } else if (res.status === 400) {
@@ -106,9 +107,9 @@ export default class Data {
     }
   }
 
-  async deleteCourse(id, emailAddress, password) {
-    const res = await this.api(`/courses/${id}`, 'DELETE', null, true, { emailAddress, password });
-    if (res.status === 204) {
+  async deleteCourse(courseId, emailAddress, password) {
+    const res = await this.api(`/courses/${courseId}`, 'DELETE', null, true, { emailAddress, password });
+    if (res.status === 200) {
       return [];
     } else if (res.status === 403) {
       return res.json().then(data => {

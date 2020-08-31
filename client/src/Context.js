@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
 // Import the Data.js file containing the helper class:
 import Data from './Data';
-//import Cookies from 'js-cookie';
+import Cookies from 'js-cookie';
 
 const Context = React.createContext(); 
 
 export class Provider extends Component {
 
   state = {
-    authenticatedUser: null
+    authenticatedUser: Cookies.getJSON('authenticatedUser') || null
   };
 
   constructor() {
@@ -25,7 +25,6 @@ export class Provider extends Component {
     const value = {
       // Pass state to <Context.Provider> by adding authenticatedUser to the value object
       authenticatedUser,
-      //isAuthenticated,
       data : this.data,
       actions: { 
         signIn: this.signIn,
@@ -52,6 +51,7 @@ export class Provider extends Component {
           authenticatedUser: user,
         };
       });
+      Cookies.set('authenticatedUser', JSON.stringify(user), {expires: 1});
     }
     // Set signIn to reutrn the user object stored in the variable user:
     return user;
@@ -59,21 +59,13 @@ export class Provider extends Component {
   }
 
   signOut = () => {
-    this.setState(() => {
-      return {
-        authenticatedUser: null,
-      };
-    });
+    this.setState({ authenticatedUser: null });
+    Cookies.remove('authenticatedUser');
+    };
   }
-}
+
 
 export const Consumer = Context.Consumer;
-
-/**
- * A higher-order component that wraps the provided component in a Context Consumer component.
- * @param {class} Component - A React component.
- * @returns {function} A higher-order component.
- */
 
 export default function withContext(Component) {
   return function ContextComponent(props) {
