@@ -4,7 +4,6 @@ import ReactMarkdown from 'react-markdown';
 
 export default class CourseDetail extends Component {
 
-
     constructor(props) {
         super (props)
         this.state = {
@@ -15,7 +14,6 @@ export default class CourseDetail extends Component {
 
     }
     
-
     componentDidMount() {
        const { context } = this.props;
        context.data.getCourse(this.props.match.params.id)
@@ -38,11 +36,17 @@ export default class CourseDetail extends Component {
         const { authenticatedUser, author } = this.state;
         if (authenticatedUser) {
             if(author.id === authenticatedUser.id) {
-                console.log('authUse');
+                //console.log('authUse');
                 return(
-                    
-                    <Link className="button" to={`/courses/${courseId}/update`}>Update Course</Link>
-                    
+                    <span>
+                        <Link className="button" to={`/courses/${courseId}/update`}>Update Course</Link>
+                        <Link className="button" onClick={this.deleteCourse} to={`/courses/${courseId}/delete`}>Delete Course</Link>
+                        <Link className="button button-secondary" to="/">Return to List</Link>
+                    </span>
+                )
+            } else {
+                return (
+                    <Link className="button button-secondary" to="/">Return to List</Link>
                 )
             }
         }
@@ -53,7 +57,6 @@ export default class CourseDetail extends Component {
         const { authenticatedUser } = this.state;
         const emailAddress = authenticatedUser.emailAddress;
         const password = authenticatedUser.password;
-        const userId = authenticatedUser.id;
         const id = this.props.match.params.id;
 
         context.data.deleteCourse(id, emailAddress, password)
@@ -76,20 +79,8 @@ export default class CourseDetail extends Component {
             <div>
                 <div className="actions--bar">
                     <div className="bounds">
-                        <div className="grid-100">
-                        <span>
-                            
-                                
-                        {this.authUpdate()}
-                        <Link className="button" to="/">Delete Course</Link>
-                        <Link className="button button-secondary" to="/">Return to List</Link>
-                    
-                    
-                            
-                        </span>    
-                            
-                  
-                           
+                        <div className="grid-100">     
+                            {this.authUpdate()}
                         </div>
                     </div>
                 </div>

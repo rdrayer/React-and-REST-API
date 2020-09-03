@@ -7,6 +7,7 @@ import {
 
 import Header from './components/Header';
 import NotFound from './components/NotFound';
+import Forbidden from './components/Forbidden';
 import Courses from './components/Courses';
 import CourseDetail from './components/CourseDetail';
 import CreateCourse from './components/CreateCourse';
@@ -50,6 +51,7 @@ export default () => (
         <Route path="/signup" component={UserSignUpWithContext} />
         <Route path="/signout" component={UserSignOutWithContext} />
         <Route component={NotFound} />
+        <Route component={Forbidden} />
       </Switch>
     </div>
   </Router>

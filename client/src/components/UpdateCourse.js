@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Form from './Form';
 
 export default class UpdateCourse extends Component {
+  
     constructor(props) {
         super(props);
         this.state = {
@@ -11,37 +12,35 @@ export default class UpdateCourse extends Component {
           materialsNeeded: '',
           user: '',
           courseId: '',
-          userId: '',
           errors: []
         }
       }
-      
-    
-      /**
-       * Checks for course details based on the ID param, if a course exists,
-       * setState is triggered with the requested data. If a user is not Authorized to make changes 
-       * on that course. User is re-routed to Forbidden. If a course is not found, user is redirected to notfound.
-       */
     
       componentDidMount() {
         const { context } = this.props;
         const authUser = this.props.context.authenticatedUser;
-        context.data.courseDetail(this.props.match.params.id).then(course => {
+        context.data.getCourse(this.props.match.params.id).then(course => {
           if (course) {
             this.setState({
               title: course.title,
               description: course.description,
               estimatedTime: course.estimatedTime,
               materialsNeeded: course.materialsNeeded,
-              user: course.user,
-              courseId: course.id,
-              userId: course.userId
+              user: course.userId,
+              courseId: course.id
             });
           }
-          if (!authUser || authUser.Id !== this.state.user.id){
+
+          if (authUser.Id === this.state.user.userId) {
+            console.log('user authorized in update');
+          }
+
+          if (!authUser || (authUser.Id !== this.state.user.userId)) {
             this.props.history.push('/forbidden')
           }
+
           if (!course) {
+            console.log('!course');
             this.props.history.push('/notfound')
           }
         })
@@ -50,10 +49,6 @@ export default class UpdateCourse extends Component {
           this.props.history.push('/error')
         });
       }
-    
-      /**
-       * Renders the Update Course page if Authorized.
-       */
       
       render() {
         const { context } = this.props;
@@ -88,7 +83,7 @@ export default class UpdateCourse extends Component {
                           className="input-title course--title--input" 
                           placeholder="Course title..." />
                       </div>
-                      <p>By {context.authenticatedUser.Name}</p>
+                      <p>By {context.authenticatedUser.firstName} {context.authenticatedUser.lastName}</p>
                     </div>
                     <div className="course--description">
                       <div>
@@ -139,23 +134,16 @@ export default class UpdateCourse extends Component {
         ) 
       }
     
-      //Updates state based on Form field values.
-    
       change = (event) => {
         const name = event.target.name;
         const value = event.target.value;
     
         this.setState(() => {
           return {
-            [name]: value
+            [name]: value || ''
           };
         });
       }
-    
-      /**
-       * Allows user to Update a course only it they were the one to Author the course. 
-       * A user cannot Update someone elses Course.
-       */
     
       submit = () => {
         const { context } = this.props;
@@ -165,8 +153,7 @@ export default class UpdateCourse extends Component {
           title,
           description,
           estimatedTime,
-          materialsNeeded,
-          user
+          materialsNeeded
         } = this.state;
     
         
@@ -174,19 +161,16 @@ export default class UpdateCourse extends Component {
           title,
           description,
           estimatedTime,
-          materialsNeeded,
-          user
+          materialsNeeded
         };
         
         context.data.updateCourse(courseId, course, emailAddress, password)
         .then( errors => {
-          if (errors.length > 0){
+          if (errors.length){
             this.setState({ errors });
-          } else if (errors.length === 0) {
-            this.props.history.push(`/courses/${courseId}`)
           } else {
-            this.props.history.push('/notfound')
-          }
+            this.props.history.push(`/courses/${courseId}`)
+          } 
         })
         .catch( err => {
           console.log(err);
@@ -194,9 +178,7 @@ export default class UpdateCourse extends Component {
         });
       }
       
-    
-      //Redirects users back to the Course page that was currently being updated if the cancel button is clicked.  
-    
+      //Redirect back to course page
       cancel = () => {
         const courseId = this.props.match.params.id;
         this.props.history.push(`/courses/${courseId}`);
