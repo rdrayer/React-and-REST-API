@@ -8,7 +8,8 @@ const Context = React.createContext();
 export class Provider extends Component {
 
   state = {
-    authenticatedUser: Cookies.getJSON('authenticatedUser') || null
+    authenticatedUser: Cookies.getJSON('authenticatedUser') || null,
+    password: Cookies.getJSON('password') || null
   };
 
   constructor() {
@@ -19,12 +20,13 @@ export class Provider extends Component {
 
   render() {
     // Use destructuring assignment to extract authenticatedUser from this.state
-    const { authenticatedUser } = this.state;
+    const { authenticatedUser, password } = this.state;
 
     // Create a value object to provide the utility methods of the class Data.
     const value = {
       // Pass state to <Context.Provider> by adding authenticatedUser to the value object
       authenticatedUser,
+      password,
       data : this.data,
       actions: { 
         signIn: this.signIn,
@@ -45,6 +47,8 @@ export class Provider extends Component {
     // Initialize a var named user and set the value to await a promise returned by this.data.getUser()
     const user = await this.data.getUser(emailAddress, password);
     if (user !== null) {
+      user.password = password;
+      user.emailAddress = emailAddress;
       // If the value of user is not null, update the authenticatedUser state to the value of user:
       this.setState(() => {
         return {
