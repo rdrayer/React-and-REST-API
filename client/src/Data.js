@@ -85,7 +85,9 @@ export default class Data {
     if (res.status === 201) {
       return [];
     } else if (res.status === 400) {
-      //return data.errors;
+      return res.json().then(data => {
+        return data.errors;
+      });
     } else {
       throw new Error(
         'POST COURSE error'
@@ -108,9 +110,12 @@ export default class Data {
     }
   }
 
-  async deleteCourse(id, emailAddress, password) {
-    const res = await this.api(`/courses/${id}/delete`, 'DELETE', null, true, { emailAddress, password });
-    if (res.status === 200) {
+  async deleteCourse(courseId, emailAddress, password) {
+    const res = await this.api(`/courses/${courseId}`, 'DELETE', null, true, { emailAddress, password });
+    //console.log(id);
+    //console.log(emailAddress, "email");
+    //console.log(password, "pw");
+    if (res.status === 204) {
       return [];
     } else if (res.status === 403) {
       return res.json().then(data => {

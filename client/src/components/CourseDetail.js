@@ -40,7 +40,7 @@ export default class CourseDetail extends Component {
                 return(
                     <span>
                         <Link className="button" to={`/courses/${courseId}/update`}>Update Course</Link>
-                        <Link className="button" onClick={this.deleteCourse} to={`/courses/${courseId}/delete`}>Delete Course</Link>
+                        <Link className="button" onClick={this.deleteCourse} to={`/courses/${courseId}`}>Delete Course</Link>
                         <Link className="button button-secondary" to="/">Return to List</Link>
                     </span>
                 )
@@ -64,11 +64,13 @@ export default class CourseDetail extends Component {
             if(errors.length) {
                 this.setState({ errors });
             } else {
-                this.props.history.push("/courses");
+                //console.log("delete success");
+                this.props.history.push("/");
             }
         })
         .catch((err) => {
-            this.props.history.push("/error");
+            //console.log("notfound");
+            this.props.history.push("/NotFound");
         })
     }
 
