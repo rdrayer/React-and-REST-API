@@ -52,56 +52,57 @@ export default class CreateCourse extends Component {
                 <div className="course--header">
                   <h4 className="course--label">Course</h4>
                   <div>                    
-                    <input onChange={this.change}
-                           id="title"
-                           name="title" 
-                           type="text"
-                           className="input-title course--title--input"
-                           placeholder="Course title..."
-                           value={title} />
+                    <input 
+                      onChange={this.change}
+                      id="title"
+                      name="title" 
+                      type="text"
+                      className="input-title course--title--input"
+                      placeholder="Course title..."
+                      value={title} />
                   </div>
                   <p>By {this.state.name}</p>
                   </div>
-  
                 <div className="course--description">
                   <h4 className="course--label">Description</h4>
                   <div>
-                    <textarea onChange={this.change}
-                              id="description"
-                              name="description"
-                              className=""
-                              placeholder="Course description..."
-                              value={description}>
+                    <textarea 
+                      onChange={this.change}
+                      id="description"
+                      name="description"
+                      className=""
+                      placeholder="Course description..."
+                      value={description}>
                     </textarea>
                   </div>
                 </div>
               </div>
-              
               <div className="grid-25 grid-right">
                 <div className="course--stats">
                   <ul className="course--stats--list">
                     <li className="course--stats--list--item">
                       <h4>Estimated Time</h4>
                       <div>
-                        <input onChange={this.change}
-                               id="estimatedTime"
-                               name="estimatedTime"
-                               type="text"
-                               className="course--time--input"
-                               placeholder="Hours"
-                               value={estimatedTime} />
+                        <input 
+                          onChange={this.change}
+                          id="estimatedTime"
+                          name="estimatedTime"
+                          type="text"
+                          className="course--time--input"
+                          placeholder="Hours"
+                          value={estimatedTime} />
                       </div>
                     </li>
-                    
                     <li className="course--stats--list--item">
                       <h4>Materials Needed</h4>
                       <div>
-                        <textarea onChange={this.change} 
-                                  id="materialsNeeded"
-                                  name="materialsNeeded"
-                                  className=""
-                                  placeholder="Please list each material..."
-                                  value={materialsNeeded}>
+                        <textarea 
+                          onChange={this.change} 
+                          id="materialsNeeded"
+                          name="materialsNeeded"
+                          className=""
+                          placeholder="Please list each material..."
+                          value={materialsNeeded}>
                         </textarea>
                       </div>
                     </li>
@@ -109,12 +110,8 @@ export default class CreateCourse extends Component {
                 </div>
               </div>
               </React.Fragment>
-            
-            
             )} />
-          
           </div>
-      
       )
     }
   
@@ -145,7 +142,8 @@ export default class CreateCourse extends Component {
       //console.log(password, "pw")
       context.data.createCourse(course, emailAddress, password)
       .then(errors => {
-        if (errors && errors.length > 0) {
+        //console.log(errors, "create errors");
+        if (errors) {
           this.setState({ errors });
         } else {
           this.props.history.push('/');
@@ -169,8 +167,7 @@ export default class CreateCourse extends Component {
       });
     }
   
-    cancel = (e) => {
-      e.preventDefault();
+    cancel = () => {
       this.props.history.push('/');
     }
 }

@@ -86,6 +86,7 @@ export default class Data {
       return [];
     } else if (res.status === 400) {
       return res.json().then(data => {
+        console.log(data.message);
         return data.errors;
       });
     } else {
