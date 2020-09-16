@@ -11,14 +11,13 @@ export default (props) => {
 
   function handleSubmit(event) {
     event.preventDefault();
-    console.log("handlesubmit");
+    //console.log("handlesubmit");
     submit();
   }
 
   function handleCancel(event) {
-    console.log("handlecancel");
+    //console.log("handlecancel");
     event.preventDefault();
-   
     cancel();
   }
 

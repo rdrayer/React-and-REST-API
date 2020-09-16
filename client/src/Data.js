@@ -40,12 +40,12 @@ export default class Data {
   async createUser(user) {
     const res = await this.api('/users', 'POST', user);
     if (res.status === 201) {
-      console.log("user has been created, res 201");
+      //console.log("user has been created, res 201");
       return [];
     }
     else if (res.status === 400) {
       return res.json().then(data => {
-        console.log("api error for user creation");
+        //console.log("api error for user creation");
         return data.errors;
       });
     }
@@ -86,7 +86,7 @@ export default class Data {
       return [];
     } else if (res.status === 400) {
       return res.json().then(data => {
-        console.log(data.message);
+        console.log(data);
         return data.errors;
       });
     } else {

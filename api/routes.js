@@ -48,10 +48,10 @@ const authenticateUser = async (req, res, next) => {
         // Then store the retrieved user object on the request object so any middleware functions that follow this middleware will have access to the user's info
         req.currentUser = user;
       } else {
-        message = `Authentication failure for email address: ${credentials.name}`;
+        message = `Authentication failure for email address: ${credentials.emailAddress}`;
       }
     } else {
-      message = `User not found for email address: ${credentials.name}`;
+      message = `User not found for name: ${credentials.name}`;
     }
   } else {
     message = 'Authorization header not found';
@@ -87,7 +87,20 @@ router.get('/users', authenticateUser, asyncHandler(async(req, res) => {
 }));
 
 // send POST request to /users 201 to create user (sets the location header to '/', and returns no content)
-router.post('/users', asyncHandler(async(req, res) => {
+router.post('/users', [
+  check('firstName')
+    .exists({ checkNull: true, checkFalsy: true })
+    .withMessage('Please provide a First Name'),
+  check('lastName')
+    .exists({ checkNull: true, checkFalsy: true })
+    .withMessage('Please provide a Last Name'),
+  check('emailAddress')
+    .exists({ checkNull: true, checkFalsy: true })
+    .withMessage('Please provide an Email Address'),
+  check('password')
+    .exists({ checkNull: true, checkFalsy: true })
+    .withMessage('Please provide a Password'),
+], asyncHandler(async(req, res) => {
   // get validation result from req object
   const errors = validationResult(req);
   // if there are validation errors
@@ -101,7 +114,7 @@ router.post('/users', asyncHandler(async(req, res) => {
     if (user.password) {
       user.password = bcryptjs.hashSync(user.password);
     }
-    await User.create(req.body);
+    await User.create(user);
     res.status(201).location('/').end();
   }
 }));
@@ -113,11 +126,17 @@ router.get('/courses', asyncHandler(async(req, res) => {
       attributes: {
         exclude: ['createdAt', 'updatedAt']
       },
-      include: [{ model: User, attributes: {
+      include: {
+        model: User,
+        attributes: ['id', 'firstName', 'lastName', 'emailAddress'],
         exclude: ['password', 'createdAt', 'updatedAt']
-      }}]
+      }
     });
-    res.status(200).json(courses);
+    if(courses) {
+      res.status(200).json(courses).end();
+    } else {
+      res.status(404).json({ message: "No courses found"})
+    }
 }));
 
 // send GET request to /courses/:id 200 to return the course for the provided course id
@@ -126,31 +145,47 @@ router.get('/courses/:id', asyncHandler(async(req, res) => {
     attributes: {
       exclude: ['createdAt', 'updatedAt']
     },
-    include: [{ model: User, attributes: {
+    include: {
+      model: User,
+      attributes: ['id', 'firstName', 'lastName', 'emailAddress'], 
       exclude: ['password', 'createdAt', 'updatedAt']
-    }}]
+    }
   });
-  res.status(200).json(course);
-}));
-
-// send a POST request to /courses 201 to create a course (sets the location header to the uri for the course, returns no content)
-router.post('/courses', authenticateUser, asyncHandler(async(req, res) => {
-  const course = await Course.create(req.body);
   if (course) {
-    res.status(201).location('/courses' + course.id).end();
+    res.status(200).json(course).end();
   } else {
-    res.status(400).json();
+    res.status(404).json({ message: "No courses found"})
   }
 }));
 
-// send a PUT request to /courses/:id 204 to update a course and return no content
-router.put('/courses/:id', authenticateUser,  [ 
+// send a POST request to /courses 201 to create a course (sets the location header to the uri for the course, returns no content)
+router.post('/courses', [
   check('title')
-      .exists()
-      .withMessage('Please provide a title'),
+    .exists({ checkNull: true, checkFalsy: true })
+    .withMessage('Please provide a Title'),
   check('description')
-      .exists()
-      .withMessage('Please provide a description')
+    .exists({ checkNull: true, checkFalsy: true })
+    .withMessage('Please provide a Description')
+], authenticateUser, asyncHandler(async(req, res) => {
+  const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const errorMessages = errors.array().map(error => error.msg);
+      res.status(400).json({ errors: errorMessages });
+    } else {
+      const course = await Course.create(req.body);
+      const courseId = course.dataValues.id
+      res.status(201).location(`/courses/${courseId}`).end();
+    }
+}));
+
+// send a PUT request to /courses/:id 204 to update a course and return no content
+router.put('/courses/:id', authenticateUser, [ 
+  check('title')
+      .exists({ checkNull: true, checkFalsy: true })
+      .withMessage('Please provide a Title'),
+  check('description')
+      .exists({ checkNull:true, checkFalsy: true })
+      .withMessage('Please provide a Description')
 ], asyncHandler(async(req, res) => {
   // get validation result from req object
   const errors = validationResult(req);

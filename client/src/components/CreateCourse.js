@@ -142,8 +142,8 @@ export default class CreateCourse extends Component {
       //console.log(password, "pw")
       context.data.createCourse(course, emailAddress, password)
       .then(errors => {
-        //console.log(errors, "create errors");
-        if (errors) {
+        //console.log(errors);
+        if (errors.length > 0) {
           this.setState({ errors });
         } else {
           this.props.history.push('/');
