@@ -89,6 +89,7 @@ export default class UserSignUp extends Component {
     });
   }
 
+  //Calls createUser function from Data, writes to db if successfull
   submit = () => {
     const { context } = this.props;
     const {
@@ -127,6 +128,7 @@ export default class UserSignUp extends Component {
   
   }
 
+  //Directs user back to main courses page. 
   cancel = () => {
    this.props.history.push('/');
   }

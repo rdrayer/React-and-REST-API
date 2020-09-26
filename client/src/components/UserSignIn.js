@@ -62,6 +62,7 @@ export default class UserSignIn extends Component {
     });
   }
 
+  //Verifies email address and password and directs user to main courses page if successful. 
   submit = () => {
     const { context } = this.props;
     const { from } = this.props.location.state || { from: { pathname: '/' } };
@@ -84,6 +85,7 @@ export default class UserSignIn extends Component {
       });
   }
 
+  //Back to courses main page. 
   cancel = () => {
     this.props.history.push('/');
   }

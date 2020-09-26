@@ -7,6 +7,7 @@ export default class Courses extends Component {
         courses: [],
     };
       
+    //Loads the existings courses to the page
     componentDidMount() {
         const { context } = this.props;
         context.data.getCourses()

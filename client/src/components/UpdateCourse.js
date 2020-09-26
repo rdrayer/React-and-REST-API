@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import Form from './Form';
 
 export default class UpdateCourse extends Component {
-  
+
+    //Course fields that can later be changed via state 
     constructor(props) {
         super(props);
         this.state = {
@@ -16,6 +17,7 @@ export default class UpdateCourse extends Component {
         }
       }
     
+      //Loads existing course data to page when the user has been authorized. 
       componentDidMount() {
         const { context } = this.props;
         const authUser = this.props.context.authenticatedUser;
@@ -134,6 +136,7 @@ export default class UpdateCourse extends Component {
         ) 
       }
     
+      //Handles the changes made to the course via state
       change = (event) => {
         const name = event.target.name;
         const value = event.target.value;
@@ -145,6 +148,7 @@ export default class UpdateCourse extends Component {
         });
       }
     
+      //Once course is modified and user hits Update Course, updateCourse function is called from Data and if no errors are hit, updates the db. 
       submit = () => {
         const { context } = this.props;
         const { emailAddress, password } = context.authenticatedUser;

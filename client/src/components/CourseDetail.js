@@ -14,6 +14,7 @@ export default class CourseDetail extends Component {
 
     }
     
+    //Loads the course data
     componentDidMount() {
        const { context } = this.props;
        context.data.getCourse(this.props.match.params.id)
@@ -52,6 +53,7 @@ export default class CourseDetail extends Component {
         }
     }
 
+    //This will call deleteCourse from Data and allow the authenticated owner of the course the ability to delete.
     deleteCourse = () => {
         const { context } = this.props;
         const { authenticatedUser } = this.state;

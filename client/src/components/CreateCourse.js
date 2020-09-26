@@ -115,7 +115,7 @@ export default class CreateCourse extends Component {
       )
     }
   
-    //Calls createCourse function
+    //Calls createCourse function and verifies the Title and Description are filled in at a min. Writes to db if successful.
     create = () => {
       //e.preventDefault();
       const { context } = this.props;
@@ -167,6 +167,7 @@ export default class CreateCourse extends Component {
       });
     }
   
+    //Redirect to main page if cancel button is clicked. 
     cancel = () => {
       this.props.history.push('/');
     }
